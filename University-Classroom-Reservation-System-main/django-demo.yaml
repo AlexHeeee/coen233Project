@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-demo
+  template:
+    metadata:
+      labels:
+        app: django-demo
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: django-demo
+        image: curry91998/django-demo:v2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 8080
+          name: django-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-demo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: django-demo
+  selector:
+    app: django-demo
